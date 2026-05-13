@@ -2,7 +2,7 @@ name: CIS 2.2 Audit
 
 on:
   schedule:
-    - cron: '0 9 * * *'
+    - cron: '0 9 * * *'     # Daily at 9:00 UTC
   push:
     branches: [ main ]
   workflow_dispatch:
@@ -10,7 +10,10 @@ on:
 jobs:
   audit:
     runs-on: ubuntu-latest
-    
+    permissions:
+      id-token: write
+      contents: read
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -18,29 +21,41 @@ jobs:
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
         with:
-          terraform_version: 1.6.0
+          terraform_version: "1.6.0"
 
-      - name: Configure AWS Credentials
+      - name: Configure AWS Credentials (OIDC)
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          role-to-assume: arn:aws:iam::478111025515:role/GitHubActionsTerraformRole
           aws-region: us-east-1
-
-      - name: Remove terraform lock file
-        run: rm -f terraform.lock.hcl
+          mask-aws-account-id: true
 
       - name: Terraform Init
-        run: terraform init -upgrade -no-color
+        run: terraform init -no-color
 
-      - name: Terraform Apply
-        run: terraform apply -auto-approve -no-color
+      - name: Terraform Validate
+        run: terraform validate
 
-      - name: Check Audit Result
+      - name: Terraform Plan
+        run: terraform plan -no-color
+
+      # === CIS / Security Checks ===
+      - name: Run tfsec (Security Scanner)
+        uses: aquasecurity/tfsec-action@v1
+
+      - name: Run Checkov (CIS-focused)
+        uses: bridgecrewio/checkov-action@master
+        with:
+          directory: .
+          framework: terraform
+          output_format: cli,sarif
+
+      # Your custom check
+      - name: Check CIS 2.2 Custom Output
         run: |
-          RESULT=$(terraform output -json | jq -r '.cis_2_2_status.value')
-          echo "Audit Result: $RESULT"
+          RESULT=$(terraform output -json | jq -r '.cis_2_2_status.value // "MISSING"')
+          echo "CIS 2.2 Status: $RESULT"
           if [ "$RESULT" != "PASS" ]; then
-            echo "FAIL: Public AMIs detected!"
+            echo "FAIL: CIS 2.2 check failed!"
             exit 1
           fi
