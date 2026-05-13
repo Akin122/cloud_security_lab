@@ -2,13 +2,12 @@ name: CIS 2.2 Audit
 
 on:
   schedule:
-    - cron: '0 9 * * *'     # Daily at 9:00 UTC
+    - cron: '0 9 * * *'     
   push:
     branches: [ main ]
   workflow_dispatch:
-
-jobs:
-  audit:
+jobs:  
+  audit:  
     runs-on: ubuntu-latest
     permissions:
       id-token: write
