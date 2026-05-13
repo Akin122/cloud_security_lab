@@ -1,17 +1,16 @@
-name: CIS 2.2 Public AMI Audit
+name: CIS 2.2 Audit
 
 on:
   schedule:
-    - cron: '0 9 * * *'  # Runs daily at 9 AM UTC
-  workflow_dispatch:      # Lets you run it manually too
+    - cron: '0 9 * * *'
+  push:
+    branches: [ main ]
+  workflow_dispatch:
 
 jobs:
   audit:
     runs-on: ubuntu-latest
-    permissions:
-      id-token: write
-      contents: read
-
+    
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -23,14 +22,17 @@ jobs:
 
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
-        with:    
+        with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: us-east-1
-      - name: Remove terraform lock file  
+
+      - name: Remove terraform lock file
         run: rm -f terraform.lock.hcl
+
       - name: Terraform Init
         run: terraform init -upgrade -no-color
+
       - name: Terraform Apply
         run: terraform apply -auto-approve -no-color
 
