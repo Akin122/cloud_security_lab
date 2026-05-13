@@ -40,11 +40,18 @@ jobs:
         run: terraform plan -no-color
 
       # === CIS / Security Checks ===
-      - name: Run tfsec (Security Scanner)
-        uses: aquasecurity/tfsec-action@v1
-
-      - name: Run Checkov (CIS-focused)
-        uses: bridgecrewio/checkov-action@master
+  - name: Run Trivy (Security Scanner)
+  uses: aquasecurity/trivy-action@v0.36.0
+  with:
+    scan-type: 'fs'
+    scan-ref: '.'
+    format: 'sarif'
+    output: 'trivy-results.sarif'
+    ignore-unfixed: true
+    severity: 'CRITICAL,HIGH'
+    exit-code: '1
+  - name: Run Checkov (CIS-focused)
+     uses: bridgecrewio/checkov-action@master
         with:
           directory: .
           framework: terraform
