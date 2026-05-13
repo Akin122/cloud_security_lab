@@ -1,0 +1,44 @@
+name: CIS 2.2 Public AMI Audit
+
+on:
+  schedule:
+    - cron: '0 9 *'  # Runs daily at 9 AM UTC
+  workflow_dispatch:      # Lets you run it manually too
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.6.0
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+
+      - name: Terraform Init
+        run: terraform init -no-color
+
+      - name: Terraform Apply
+        run: terraform apply -auto-approve -no-color
+
+      - name: Check Audit Result
+        run: |
+          RESULT=$(terraform output -json | jq -r '.cis_2_2_status.value')
+          echo "Audit Result: $RESULT"
+          if [ "$RESULT" != "PASS" ]; then
+            echo "FAIL: Public AMIs detected!"
+            exit 1
+          fi
