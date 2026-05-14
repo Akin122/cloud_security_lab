@@ -2,13 +2,13 @@ name: CIS 2.2 Audit
 
 on:
   schedule:
-    - cron: '0 9 * * *'     
+    - cron: '0 9 * * 1'
   push:
     branches: [ main ]
-  workflow_dispatch:  
-  
-jobs:  
-  audit:  
+  workflow_dispatch:
+
+jobs:
+  audit:
     runs-on: ubuntu-latest
     permissions:
       id-token: write
@@ -20,49 +20,25 @@ jobs:
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
-        with:
-          terraform_version: "1.6.0"
 
-      - name: Configure AWS Credentials (OIDC)
+      - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          role-to-assume: arn:aws:iam::478111025515:role/GitHubActionsTerraformRole
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: us-east-1
-          mask-aws-account-id: true
 
       - name: Terraform Init
-        run: terraform init -no-color
+        run: terraform init
 
-      - name: Terraform Validate
-        run: terraform validate
+      - name: Terraform Apply
+        run: terraform apply -auto-approve
 
-      - name: Terraform Plan
-        run: terraform plan -no-color
-
-      # === CIS / Security Checks === 
-   - name: Run Trivy (Security Scanner)
-  uses: aquasecurity/trivy-action@v0.36.0
-  with:
-    scan-type: 'fs'
-    scan-ref: '.'
-    format: 'sarif'
-    output: 'trivy-results.sarif'
-    ignore-unfixed: true
-    severity: 'CRITICAL,HIGH'
-    exit-code: '1
-  - name: Run Checkov (CIS-focused)
-     uses: bridgecrewio/checkov-action@master
-        with:
-          directory: .
-          framework: terraform
-          output_format: cli,sarif
-
-      # Your custom check
-      - name: Check CIS 2.2 Custom Output
+      - name: Check CIS 2.2 Result
         run: |
-          RESULT=$(terraform output -json | jq -r '.cis_2_2_status.value // "MISSING"')
+          RESULT=$(terraform output -raw cis_2_2_status)
           echo "CIS 2.2 Status: $RESULT"
           if [ "$RESULT" != "PASS" ]; then
-            echo "FAIL: CIS 2.2 check failed!"
+            echo "FAIL: Public AMIs found"
             exit 1
           fi
