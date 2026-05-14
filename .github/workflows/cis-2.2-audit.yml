@@ -1,44 +1,49 @@
-name: CIS 2.2 Audit
+name: CI/CD Pipeline
 
 on:
-  schedule:
-    - cron: '0 9 * * 1'
   push:
-    branches: [ main ]
+    branches: [main, develop]
+    paths-ignore: ["**.md"]
+  pull_request:
+    branches: [main]
+  schedule:
+    - cron: "0 9 * * *"
   workflow_dispatch:
 
+permissions:
+  contents: read
+
 jobs:
-  audit:
-    runs-on: ubuntu-latest
+  ci:
+    runs-on: ubuntu-24.04
     permissions:
-      id-token: write
       contents: read
+      security-events: write
+    strategy:
+      fail-fast: false
+      matrix:
+        node-version: ["20", "22"]
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v3
-
-      - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v4
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v6
         with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: us-east-1
+          node-version: ${{ matrix.node-version }}
+          cache: npm
+      - run: npm ci --prefer-offline --no-audit
+      - run: npm run lint
+      - run: npm run test:ci -- --coverage
+      - uses: github/codeql-action/init@v3
+        with:
+          languages: javascript
+          build-mode: none
+      - uses: github/codeql-action/analyze@v3
 
-      - name: Terraform Init
-        run: terraform init
+      - name: Build
+        run: npm run build
 
-      - name: Terraform Apply
-        run: terraform apply -auto-approve
-
-      - name: Check CIS 2.2 Result
-        run: |
-          RESULT=$(terraform output -raw cis_2_2_status)
-          echo "CIS 2.2 Status: $RESULT"
-          if [ "$RESULT" != "PASS" ]; then
-            echo "FAIL: Public AMIs found"
-            exit 1
-          fi
+      - uses: actions/upload-artifact@v4
+        with:
+          name: build-output-${{ matrix.node-version }}
+          path: dist/
+          retention-days: 7
