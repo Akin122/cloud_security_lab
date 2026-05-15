@@ -1,0 +1,7 @@
+skip-check:
+    - CKV2_AWS_62 # Event notifications - Day 12
+    - CKV2_AWS_61 # Lifecycle - Day 15 
+    - CKV_AWS_18  # Logging - Day 9
+    - CKV_AWS_144 # CRR - Day 20+
+    - CKV_AWS_145 # Custom KMS - Day 10
+    - CKV2_AWS_32 # AWS managed KMS acceptable
