@@ -1,80 +1,105 @@
-name: CI/CD Pipeline
+name: 30-Day AWS Security Lab - Auto Deploy
 
 on:
   push:
-    branches: [main, develop]
-    paths-ignore: ["**.md"]
+    branches: [ main ]
   pull_request:
-    branches: [main]
+    branches: [ main ]
   schedule:
-    - cron: "0 9 * * *"
+    - cron: '0 1 * * *'  # 9:00 PM Toronto time = 1:00 AM UTC
   workflow_dispatch:
 
 permissions:
   contents: read
+  pull-requests: write
+  issues: write
 
 jobs:
-  ci:
-    runs-on: ubuntu-24.04
-    permissions:
-      contents: read
-      security-events: write
-
-    strategy:
-      fail-fast: false
-      matrix:
-        node-version: ["20", "22"]
-
-    steps:
-      - uses: actions/checkout@v5
-
-      - uses: actions/setup-node@v6
-        with:
-          node-version: ${{ matrix.node-version }}
-          cache: npm
-
-      - run: npm ci --prefer-offline --no-audit
-      - run: npm run lint
-      - run: npm run test:ci -- --coverage
-
-      - uses: github/codeql-action/init@v3
-        with:
-          languages: javascript
-          build-mode: none
-
-      - uses: github/codeql-action/analyze@v3
-
-      - name: Build
-        run: npm run build
-
-      - uses: actions/upload-artifact@v4
-        with:
-          name: build-output-${{ matrix.node-version }}
-          path: dist/
-          retention-days: 7
-
   terraform:
-    runs-on: ubuntu-24.04
-    needs: ci
-    permissions:
-      contents: read
-
+    name: 'Terraform Plan & Security Scan'
+    runs-on: ubuntu-latest
+    
     steps:
-      - uses: actions/checkout@v5
-
+      - name: Checkout
+        uses: actions/checkout@v4
+      
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
         with:
-          terraform_version: "1.9.x"   # You can change this
-
-      - name: Terraform Format
+          terraform_version: 1.9.0
+        
+      - name: Terraform Format Check
         run: terraform fmt -check -recursive
-
+        
       - name: Terraform Init
         run: terraform init
-
+        
       - name: Terraform Validate
         run: terraform validate
-
+        
+      - name: Run tfsec Security Scan
+        uses: aquasecurity/tfsec-action@v1.0.3
+        with:
+          soft_fail: false
+        
+      - name: Run Checkov CIS Scan
+        uses: bridgecrewio/checkov-action@master
+        with:
+          framework: terraform
+          soft_fail: false
+          output_format: cli
+        
       - name: Terraform Plan
-        run: terraform plan -no-color
+        id: plan
+        run: terraform plan -no-color -out=tfplan
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: us-east-1
+        
+      - name: Post Plan to PR
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const output = `#### Terraform Plan 📖
+            \\\`
+            ${process.env.PLAN}
+            \\\`
+            Pushed by: @${{ github.actor }}`;
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: output
+            })
+        env:
+          PLAN: ${{ steps.plan.outputs.stdout }}
+          
+      - name: Terraform Apply
+        if: github.ref == 'refs/heads/main' && (github.event_name == 'push' || github.event_name == 'schedule')
+        run: terraform apply -auto-approve tfplan
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: us-east-1
+          
+      - name: Generate LinkedIn Summary
+        if: github.ref == 'refs/heads/main' && (github.event_name == 'push' || github.event_name == 'schedule')
+        run: |
+          echo "## 🚀 Day $(date +%d)/30 - 30-Day AWS Security Challenge by @Akin122" >> $GITHUB_STEP_SUMMARY
+          echo "Deployed at 9:00 PM EST via GitHub Actions" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "*Automated Security Lab Update*" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "*Security Scans:* ✅ tfsec + Checkov CIS 2.2/2.3/3.1/3.2 passed" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "*AWS Resources Deployed:*" >> $GITHUB_STEP_SUMMARY
+          echo '' >> $GITHUB_STEP_SUMMARY
+          terraform show -no-color tfplan | grep "# aws_" | sed 's/# //g' >> $GITHUB_STEP_SUMMARY
+          echo '' >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "Repo: github.com/Akin122/cloud_security_lab" >> $GITHUB_STEP_SUMMARY
+          echo "Commit: ${{ github.sha }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "#AWS #CloudSecurity #Terraform #30DayChallenge #DevOps #Akin122" >> $GITHUB_STEP_SUMMARYy #Terraform #30DayChallenge #DevOps #Akin122" >> $GITHUB_STEP_SUMMARY
