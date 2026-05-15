@@ -41,6 +41,8 @@ jobs:
         uses: aquasecurity/tfsec-action@v1.0.3
         with:
           soft_fail: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         
       - name: Run Checkov CIS Scan
         uses: bridgecrewio/checkov-action@master
