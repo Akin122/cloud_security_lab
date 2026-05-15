@@ -19,6 +19,7 @@ jobs:
     permissions:
       contents: read
       security-events: write
+
     strategy:
       fail-fast: false
       matrix:
@@ -26,17 +27,21 @@ jobs:
 
     steps:
       - uses: actions/checkout@v5
+
       - uses: actions/setup-node@v6
         with:
           node-version: ${{ matrix.node-version }}
           cache: npm
+
       - run: npm ci --prefer-offline --no-audit
       - run: npm run lint
       - run: npm run test:ci -- --coverage
+
       - uses: github/codeql-action/init@v3
         with:
           languages: javascript
           build-mode: none
+
       - uses: github/codeql-action/analyze@v3
 
       - name: Build
@@ -47,3 +52,29 @@ jobs:
           name: build-output-${{ matrix.node-version }}
           path: dist/
           retention-days: 7
+
+  terraform:
+    runs-on: ubuntu-24.04
+    needs: ci
+    permissions:
+      contents: read
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "1.9.x"   # You can change this
+
+      - name: Terraform Format
+        run: terraform fmt -check -recursive
+
+      - name: Terraform Init
+        run: terraform init
+
+      - name: Terraform Validate
+        run: terraform validate
+
+      - name: Terraform Plan
+        run: terraform plan -no-color
