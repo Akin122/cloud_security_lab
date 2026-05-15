@@ -2,12 +2,12 @@
 
 resource "aws_s3_bucket" "security_lab_bucket" {
   bucket = "cloudsec-lab-akin122-${formatdate("YYYYMMDD", timestamp())}"
-  
+
   tags = {
     Name        = "CloudSec Lab Bucket"
     Environment = "Lab"
     Day         = "7"
-    Owner       = "Nuel"
+    Owner       = "Akin"
   }
 }
 
@@ -22,6 +22,7 @@ resource "aws_s3_bucket_public_access_block" "secure_bucket" {
 
 resource "aws_s3_bucket_versioning" "versioning" {
   bucket = aws_s3_bucket.security_lab_bucket.id
+
   versioning_configuration {
     status = "Enabled"
   }
@@ -29,6 +30,7 @@ resource "aws_s3_bucket_versioning" "versioning" {
 
 resource "aws_s3_bucket_server_side_encryption_configuration" "encryption" {
   bucket = aws_s3_bucket.security_lab_bucket.id
+
   rule {
     apply_server_side_encryption_by_default {
       sse_algorithm = "AES256"
@@ -36,9 +38,10 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "encryption" {
   }
 }
 
-resource "aws_s3_bucket_logging" "logging" {
-  bucket = aws_s3_bucket.security_lab_bucket.id
-
-  target_bucket = aws_s3_bucket.security_lab_bucket.id
-  target_prefix = "access-logs/"
-}
+# Logging commented out for Day 7 - requires separate bucket
+# resource "aws_s3_bucket_logging" "logging" {
+#   bucket = aws_s3_bucket.security_lab_bucket.id
+# 
+#   target_bucket = aws_s3_bucket.security_lab_bucket.id
+#   target_prefix = "access-logs/"
+# }
