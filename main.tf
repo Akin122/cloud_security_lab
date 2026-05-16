@@ -16,7 +16,7 @@ resource "aws_s3_bucket" "security_lab_bucket" {
 }
 
 resource "aws_s3_bucket_public_access_block" "security_lab_bucket_pab" {
-  bucket = aws_s3_bucket.security_lab_bucket.id
+ bucket = aws_s3_bucket.security_lab_bucket.id
 
   block_public_acls       = true
   block_public_policy     = true
