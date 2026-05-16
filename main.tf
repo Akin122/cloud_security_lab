@@ -10,7 +10,7 @@ resource "aws_s3_bucket" "security_lab_bucket" {
   tags = {
     Name        = "CloudSec Lab Bucket"
     Environment = "Lab"
-    Day         = "8"
+    Day         = "9"
     Owner       = "Akin"
   }
 }
