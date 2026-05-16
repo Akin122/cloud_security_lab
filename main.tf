@@ -1,4 +1,4 @@
-# Day 7/30: CIS-Hardened S3 Bucket for Cloud Security Lab
+# Day 8/30: CIS-Hardened S3 Bucket for Cloud Security Lab
 
 #checkov:skip=CKV2_AWS_62:Event notifications not required for Day 7 lab
 #checkov:skip=CKV2_AWS_61:Lifecycle policies not required for Day 7 lab
@@ -10,12 +10,12 @@ resource "aws_s3_bucket" "security_lab_bucket" {
   tags = {
     Name        = "CloudSec Lab Bucket"
     Environment = "Lab"
-    Day         = "7"
+    Day         = "8"
     Owner       = "Akin"
   }
 }
 
-resource "aws_s3_bucket_public_access_block" "secure_bucket" {
+resource "aws_s3_bucket_public_access_block" "security_lab_bucket_pab" {
   bucket = aws_s3_bucket.security_lab_bucket.id
 
   block_public_acls       = true
@@ -25,8 +25,7 @@ resource "aws_s3_bucket_public_access_block" "secure_bucket" {
 }
 
 resource "aws_s3_bucket_versioning" "versioning" {
-  bucket = aws_s3_bucket.security_lab_bucket.id
-
+ bucket = aws_s3_bucket.security_lab_bucket.id
   versioning_configuration {
     status = "Enabled"
   }
