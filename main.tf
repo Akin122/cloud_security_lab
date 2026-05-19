@@ -64,15 +64,16 @@ resource "aws_s3_bucket_public_access_block" "logs_pab" {
   restrict_public_buckets = true
 }
 
-resource "aws_s3_bucket_lifecycle_configuration" "log_lifecycle" {
+resource "aws_s3_bucket_versioning" "logs_versioning" {
   bucket = aws_s3_bucket.s3_access_logs.id
-
-  rule {
-    id     = "delete-old-logs"
+  versioning_configuration {
     status = "Enabled"
-
+  }
+}
     filter {}
-
+abort_incomplete_multipart_upload {
+  days_after_initiation = 7
+}
     expiration {
       days = 30
     }
