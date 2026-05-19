@@ -64,13 +64,6 @@ resource "aws_s3_bucket_public_access_block" "logs_pab" {
   restrict_public_buckets = true
 }
 
-resource "aws_s3_bucket_logging" "security_lab_bucket_logging" {
-  bucket = aws_s3_bucket.security_lab_bucket.id
-
-  target_bucket = aws_s3_bucket.s3_access_logs.id
-  target_prefix = "s3-access-logs/"
-}
-
 resource "aws_s3_bucket_lifecycle_configuration" "log_lifecycle" {
   bucket = aws_s3_bucket.s3_access_logs.id
 
@@ -78,10 +71,10 @@ resource "aws_s3_bucket_lifecycle_configuration" "log_lifecycle" {
     id     = "delete-old-logs"
     status = "Enabled"
 
+    filter {}
+
     expiration {
       days = 30
     }
-  }
-}
   }
 }
