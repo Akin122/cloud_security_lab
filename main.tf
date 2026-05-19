@@ -10,7 +10,7 @@ resource "aws_s3_bucket" "security_lab_bucket" {
   tags = {
     Name        = "CloudSec Lab Bucket"
     Environment = "Lab"
-    Day         = "9"
+    Day         = "10"
     Owner       = "Akin"
   }
 }
@@ -39,6 +39,51 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "encryption" {
   rule {
     apply_server_side_encryption_by_default {
       sse_algorithm = "aws:kms"
+    }
+  }
+}
+
+# Day 10: S3 Access Logging + Lifecycle for Cloud Security Lab
+
+# 1. Separate bucket for storing access logs
+resource "aws_s3_bucket" "s3_access_logs" {
+  bucket = "cloudsec-lab-akin122-logs-${formatdate("YYYYMMDD", timestamp())}"
+  
+  tags = {
+    Name        = "CloudSec Lab Logs"
+    Environment = "Lab"
+    Day         = "10"
+    Owner       = "Akin"
+  }
+}
+
+# Lock down the logs bucket too
+resource "aws_s3_bucket_public_access_block" "logs_pab" {
+  bucket                  = aws_s3_bucket.s3_access_logs.id
+  block_public_acls       = true
+  block_public_policy     = true
+  ignore_public_acls      = true
+  restrict_public_buckets = true
+}
+
+# 2. Turn on logging for your Day 9 bucket
+resource "aws_s3_bucket_logging" "security_lab_bucket_logging" {
+  bucket = aws_s3_bucket.security_lab_bucket.id
+
+  target_bucket = aws_s3_bucket.s3_access_logs.id
+  target_prefix = "s3-access-logs/"
+}
+
+# 3. Auto-delete logs after 30 days to save money
+resource "aws_s3_bucket_lifecycle_configuration" "log_lifecycle" {
+  bucket = aws_s3_bucket.s3_access_logs.id
+
+  rule {
+    id     = "delete-old-logs"
+    status = "Enabled"
+
+    expiration {
+      days = 30
     }
   }
 }
