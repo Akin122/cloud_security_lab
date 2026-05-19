@@ -70,10 +70,19 @@ resource "aws_s3_bucket_versioning" "logs_versioning" {
     status = "Enabled"
   }
 }
+resource "aws_s3_bucket_lifecycle_configuration" "log_lifecycle" {
+  bucket = aws_s3_bucket.s3_access_logs.id
+
+  rule {
+    id     = "delete-old-logs"
+    status = "Enabled"
+
     filter {}
-abort_incomplete_multipart_upload {
-  days_after_initiation = 7
-}
+
+    abort_incomplete_multipart_upload {
+      days_after_initiation = 7
+    }
+
     expiration {
       days = 30
     }
