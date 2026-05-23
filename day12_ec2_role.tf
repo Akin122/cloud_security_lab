@@ -22,9 +22,18 @@ resource "aws_iam_instance_profile" "ec2_profile" {
   name = "ec2-s3-readonly-profile"
   role = aws_iam_role.ec2_s3_readonly.name
 }
+data "aws_ami" "amazon_linux_2023" {
+  most_recent = true
+  owners      = ["amazon"]
+
+  filter {
+    name   = "name"
+    values = ["al2023-ami-2023.*-x86_64"]
+  }
+}
 
 resource "aws_instance" "demo_ec2" {
-  ami                  = "ami-0c02fb559556c7d316" # Amazon Linux 2023 in us-east-1. Change if needed
+  ami                  = data.aws_ami.amazon_linux_2023.id
   instance_type        = "t2.micro"
   iam_instance_profile = aws_iam_instance_profile.ec2_profile.name
   monitoring           = true
