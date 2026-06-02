@@ -32,11 +32,11 @@ data "aws_ami" "amazon_linux_2023" {
   }
 }
 
-resource "aws_instance" "demo_ec2" {
-  ami                  = data.aws_ami.amazon_linux_2023.id
-  instance_type        = "t2.micro"
-  iam_instance_profile = aws_iam_instance_profile.ec2_profile.name
-  monitoring           = true
+#resource "aws_instance" "demo_ec2" {
+#  ami                  = data.aws_ami.amazon_linux_2023.id
+#  instance_type        = "t2.micro"
+#  iam_instance_profile = aws_iam_instance_profile.ec2_profile.name
+#  monitoring           = true
 
   metadata_options {
     http_tokens   = "required" # Disables IMDSv1, forces IMDSv2
