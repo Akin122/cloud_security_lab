@@ -23,7 +23,7 @@ AWS Secrets Manager vs SSM Parameter Store. Removed hardcoded credentials from c
 ### Week 2: IAM & Data Protection - Complete
 **Day 14/30: KMS CMK + S3 SSE-KMS Encryption 🔑**  
 Customer Managed Key + S3 bucket policy to reject unencrypted uploads.  
-[Code](day14_kms_s3_encryption.tf)sqd
+[Code](day14_kms_s3_encryption.tf)
 
 **Day 13/30: MFA Enforcement 🛡️**  
 Terraform to enforce MFA for destructive actions + strong password policy.  
