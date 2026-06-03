@@ -23,7 +23,7 @@ AWS Secrets Manager vs SSM Parameter Store. Removed hardcoded credentials from c
 ### Week 2: IAM & Data Protection - Complete
 **Day 14/30: KMS CMK + S3 SSE-KMS Encryption 🔑**  
 Customer Managed Key + S3 bucket policy to reject unencrypted uploads.  
-[Code](day14_kms_s3_encryption.tf)
+[Code](day14_kms_s3_encryption.tf)sqd
 
 **Day 13/30: MFA Enforcement 🛡️**  
 Terraform to enforce MFA for destructive actions + strong password policy.  
@@ -41,7 +41,7 @@ Audited account for public AMIs using Terraform + AWS CLI. Result: PASS
 *Day 1-5, 7-11: AWS CLI setup, IAM basics, S3 security - Labs coming soon*
 
 ### How to Run
-1. terraform init
+1. `terraform init`
 2. `terraform plan` 
 3. `terraform apply`
 
