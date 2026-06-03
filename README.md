@@ -6,7 +6,7 @@ Hands-on AWS Security labs implementing CIS AWS Foundations Benchmark v2.2 & v2.
 ### Week 3: Networking & Logging - Current
 **Day 18/30: VPC Basics with Terraform 🌐**  
 Built public + private subnets, Security Groups, NACLs. Defense in depth: SGs = instance firewall, NACLs = subnet firewall.  
-`[Code](day18_vpc.tf)`
+[Code](day18_vpc.tf)
 
 **Day 17/30: CloudTrail Multi-Region Logging 📊**  
 Multi-region trail `akin-soc-trail` with KMS encryption + log file validation. Foundation for GuardDuty + Security Hub.  
