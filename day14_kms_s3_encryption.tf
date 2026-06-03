@@ -12,7 +12,7 @@ resource "aws_kms_key" "s3_cmk" {
 }
 
 # 2. Alias makes the key easier to read in console
-resource "aws_kms_key_alias" "s3_alias" {
+resource "aws_kms_alias" "s3_alias" {
   name          = "alias/s3-day14-cmk"
   target_key_id = aws_kms_key.s3_cmk.key_id
 }
