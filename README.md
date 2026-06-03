@@ -10,33 +10,33 @@ Built public + private subnets, Security Groups, NACLs. Defense in depth: SGs = 
 
 **Day 17/30: CloudTrail Multi-Region Logging 📊**  
 Multi-region trail `akin-soc-trail` with KMS encryption + log file validation. Foundation for GuardDuty + Security Hub.  
-`[Code](day17_cloudtrail.tf)`
+[Code](day17_cloudtrail.tf)
 
 **Day 16/30: Terraform Lifecycle + Incident Response 💻**  
 Built infra with Terraform, then `terraform destroy`. All actions logged in CloudTrail for forensic analysis.  
-`[Code](day16_guardduty.tf)`
+[Code](day16_guardduty.tf)
 
 **Day 15/30: Secrets Management 🔐**  
 AWS Secrets Manager vs SSM Parameter Store. Removed hardcoded credentials from code. SOC lesson: auto-rotation.  
-`[Code](day15_secrets_manager.tf)` `[Code](day15_ssm_parameter.tf)`
+[Code](day15_secrets_manager.tf) [Code](day15_ssm_parameter.tf)
 
 ### Week 2: IAM & Data Protection - Complete
 **Day 14/30: KMS CMK + S3 SSE-KMS Encryption 🔑**  
 Customer Managed Key + S3 bucket policy to reject unencrypted uploads.  
-`[Code](day14_kms_s3_encryption.tf)`
+[Code](day14_kms_s3_encryption.tf)
 
 **Day 13/30: MFA Enforcement 🛡️**  
 Terraform to enforce MFA for destructive actions + strong password policy.  
-`[Code](day13_mfa_enforcement.tf)`
+[Code](day13_mfa_enforcement.tf)
 
 **Day 12/30: Secure IAM Role for EC2 🔒**  
 Least-privilege IAM role for EC2 instead of root credentials.  
-`[Code](day12_ec2_role.tf)`
+[Code](day12_ec2_role.tf)
 
 ### Week 1: Foundation & Auditing - Partial
 **Day 6/30: CIS 2.2 Public AMI Audit ✅**  
 Audited account for public AMIs using Terraform + AWS CLI. Result: PASS  
-`[Code](day5-cis-2.2-public-ami-audit/)`
+[Code](day5-cis-2.2-public-ami-audit/)
 
 *Day 1-5, 7-11: AWS CLI setup, IAM basics, S3 security - Labs coming soon*
 
