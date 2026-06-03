@@ -1,6 +1,6 @@
 # Secrets Manager - basic secret
 resource "aws_secretsmanager_secret" "api_key" {
-  name        = "cloud_security_lab/dev/api_key"
+  name        = "cloud_security_lab/dev/api_key_v2"
   description = "Day 15 lab - API key stored in Secrets Manager"
   
   tags = {
