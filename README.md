@@ -1,4 +1,12 @@
 ## 30 Days of Cloud Security Labs
+Day 15/30: Secrets Management with Terraform 🔐
+Stored DB credentials + API keys using AWS Secrets Manager vs SSM Parameter Store. Removed hardcoded secrets. SOC lesson: Secrets Manager auto-rotation vs SSM free tier. [Code](day15_secrets_manager.tf)
+
+Day 16/30: Terraform Lifecycle + CloudTrail Prep 💻
+Built lab infra with Terraform, then destroyed it clean. `terraform destroy` → 1 destroyed. SOC angle: CloudTrail logs every Destroy action for incident response. [Code](day16_guardduty.tf)
+
+Day 17/30: CloudTrail Multi-Region Logging 📊
+Configured multi-region CloudTrail trail `akin-soc-trail` with KMS encryption + log validation. Tracks all API calls across regions. Foundation for GuardDuty + Security Hub. [Code](day17_cloudtrail.tf)
 Day 14/30: KMS CMK + S3 SSE-KMS Encryption with Terraform 🔐
 
 Built Customer Managed Key in AWS KMS + forced S3 to reject unencrypted uploads. Enabled Bucket Key for cost optimization.
