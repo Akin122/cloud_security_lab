@@ -41,7 +41,7 @@ Audited account for public AMIs using Terraform + AWS CLI. Result: PASS
 *Day 1-5, 7-11: AWS CLI setup, IAM basics, S3 security - Labs coming soon*
 
 ### How to Run
-1. `terraform init`
+1. terraform init
 2. `terraform plan` 
 3. `terraform apply`
 
