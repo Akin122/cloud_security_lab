@@ -32,25 +32,25 @@ data "aws_ami" "amazon_linux_2023" {
   }
 }
 
-#resource "aws_instance" "demo_ec2" {
-#  ami                  = data.aws_ami.amazon_linux_2023.id
-#  instance_type        = "t2.micro"
-#  iam_instance_profile = aws_iam_instance_profile.ec2_profile.name
-#  monitoring           = true
-
-  metadata_options {
-    http_tokens   = "required" # Disables IMDSv1, forces IMDSv2
-    http_endpoint = "enabled"
-  }
-
-  root_block_device {
-    encrypted  = true
-    kms_key_id = null # Uses default AWS EBS KMS key
-  }
-
-  ebs_optimized = true
-
-  tags = {
-    Name = "day12-least-privilege-ec2"
-  }
-}
+# resource "aws_instance" "demo_ec2" {
+#   ami           = data.aws_ami.amazon_linux_2023.id
+#   instance_type = "t2.micro"
+#   iam_instance_profile = aws_iam_instance_profile.ec2_profile.name
+#   monitoring    = true
+#
+#   metadata_options {
+#     http_tokens = "required" # Disables IMDSv1, forces IMDSv2
+#     http_endpoint = "enabled"
+#   }
+#
+#   root_block_device {
+#     encrypted = true
+#     kms_key_id = null # Uses default AWS EBS KMS key
+#   }
+#
+#   ebs_optimized = true
+#
+#   tags = {
+#     Name = "day12-least-privilege-ec2"
+#   }
+# }
