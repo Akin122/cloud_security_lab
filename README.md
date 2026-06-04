@@ -36,7 +36,11 @@ Least-privilege IAM role for EC2 instead of root credentials.
 ### Week 1: Foundation & Auditing - Partial
 **Day 6/30: CIS 2.2 Public AMI Audit ✅**  
 Audited account for public AMIs using Terraform + AWS CLI. Result: PASS  
-[Code](day5-cis-2.2-public-ami-audit/)
+[Code](day6_cis_ami_audit/)
+
+**Screenshot**:
+![CIS 2.2 Check](day6_cis_ami_audit/screenshot.png)
+*Result: [] = 0 public AMIs = PASS*
 
 *Day 1-5, 7-11: AWS CLI setup, IAM basics, S3 security - Labs coming soon*
 
