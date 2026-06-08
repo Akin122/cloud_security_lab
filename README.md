@@ -3,6 +3,11 @@
 Hands-on AWS Security labs implementing CIS AWS Foundations Benchmark v2.2 & v2.3 using Terraform.  
 **Status**: Day 18/30 complete | **Goal**: SOC Analyst role
 
+Day 19/30: Network Segmentation + Security Groups with Terraform 🔒
+Built public subnet 10.0.1.0/24 + private subnet 10.0.2.0/24 + SG firewall for HTTP. 
+Learned defense in depth: public servers stay public, databases stay private.
+[Code](day19)
+
 ### Week 3: Networking & Logging - Current
 **Day 18/30: VPC Basics with Terraform 🌐**  
 Built public + private subnets, Security Groups, NACLs. Defense in depth: SGs = instance firewall, NACLs = subnet firewall.  
